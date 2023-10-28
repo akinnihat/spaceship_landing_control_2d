@@ -1,11 +1,17 @@
 #ifndef MISSION_HEADER_FILE
 #define MISSION_HEADER_FILE
 
+#include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_opengl.h>
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_sdl2.h"
+#include "../imgui/imgui_impl_sdlrenderer2.h"
 #include "../world/Spaceship.h"
 #include "../world/Environment.h"
 #include "../control/PIDController.h"
+
 
 class Mission
 {
@@ -16,7 +22,9 @@ private:
 	PIDController m_PIDControllerHorizontal;
 	PIDController m_PIDControllerVertical;
 	SDL_Window* m_Window;
+	SDL_GLContext m_GLContext;
 	SDL_Renderer* m_Renderer;
+	//ImGuiIO& m_io;
 	int m_MouseY{0};
 	int m_MouseX{0};
 	

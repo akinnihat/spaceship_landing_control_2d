@@ -1,32 +1,39 @@
-OBJS = build/main.o build/Mission.o build/Spaceship.o build/Environment.o build/PIDController.o
-HEADERS = src/core/Mission.h src/world/Spaceship.h src/world/Environment.h src/control/PIDController.h
+
+EXE = Spaceship_Landing_Control_2D
+SOURCES = src/main.cpp
+SOURCES += src/core/Mission.cpp src/world/Spaceship.cpp src/world/Environment.cpp src/control/PIDController.cpp
+SOURCES += imgui.cpp imgui_draw.cpp imgui_tables.cpp imgui_widgets.cpp
+SOURCES += src/imgui/imgui_impl_sdl2.cpp  src/imgui/imgui_impl_sdlrenderer2.cpp 
+OBJDIR = build
+$(shell mkdir -p $(OBJDIR))
+OBJS = $(addprefix $(OBJDIR)/, $(addsuffix .o, $(basename $(notdir $(SOURCES)))))
+
 CC = g++
-COMPILER_FLAGS = -w
-LINKER_FLAGS = -lSDL2 -lSDL2_image
+COMPILER_FLAGS = -w -std=c++11 -I -Ibackends -g -Wall -Wformat `sdl2-config --cflags`
+LINKER_FLAGS = -lSDL2 -lSDL2_image -lGL -ldl `sdl2-config --libs`
 
+build/main.o: src/main.cpp 
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-build/main.o: src/main.cpp $(HEADERS)
-	$(CC) -c $(COMPILER_FLAGS) $< -o $@
+build/%.o:src/core/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-build/Mission.o: src/core/Mission.cpp src/core/Mission.h
-	$(CC) -c $(COMPILER_FLAGS) $< -o $@
+build/%.o:src/control/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-build/Spaceship.o: src/world/Spaceship.cpp src/world/Spaceship.h
-	$(CC) -c $(COMPILER_FLAGS) $< -o $@
+build/%.o:src/world/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-build/Environment.o: src/world/Environment.cpp src/world/Environment.h
-	$(CC) -c $(COMPILER_FLAGS) $< -o $@
-
-build/PIDController.o: src/control/PIDController.cpp src/control/PIDController.h
-	$(CC) -c $(COMPILER_FLAGS) $< -o $@
-
-Spaceship_Landing_Control_2D: $(OBJS)
-	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $@
-
+build/%.o:src/imgui/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 # make all
-all: Spaceship_Landing_Control_2D
+all: $(EXE)
+
+$(EXE): $(OBJS)
+	$(CC) -o $@ $^ $(COMPILER_FLAGS) $(LINKER_FLAGS)
+	@echo Build complete
 
 # make clean
 clean:
-	rm -f $(OBJS) Spaceship_Landing_Control_2D
+	rm -f $(OBJS) $(EXE)

@@ -3,6 +3,7 @@
 const int SCREEN_WIDTH = 768;    
 const int SCREEN_HEIGHT = 1024;	 
 
+
 Mission::Mission()
 {
 
@@ -10,12 +11,15 @@ Mission::Mission()
 
 Mission::~Mission()
 {
+	ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
 	SDL_DestroyRenderer(m_Renderer);
     m_Renderer = NULL;
 
     SDL_DestroyWindow(m_Window);
     m_Window = NULL;
-    
+   
     SDL_Quit();
 }
 
@@ -45,6 +49,7 @@ void Mission::start()
 	{	
 		runMission();
 	}
+
 }
 
 void Mission::initSpaceship(SDL_Texture *texture)
@@ -93,12 +98,12 @@ bool Mission::initVisuals()
 	else
 	{
 		// Create window
-		m_Window = SDL_CreateWindow("Spaceship Mission", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		m_Window = SDL_CreateWindow("Spaceship Mission", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 		if (m_Window == NULL)
 		{
 			printf("Window could not be created. Error: %s\n", SDL_GetError());
 			success = false;
-		}
+		} 
 		else
 		{
 			// Create renderer
@@ -107,14 +112,24 @@ bool Mission::initVisuals()
 			{
 				printf("Renderer could not be created. Error: %s\n", SDL_GetError());
 			}
-		}
+		}  	
 	}
+
+	IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplSDL2_InitForSDLRenderer(m_Window, m_Renderer);
+	ImGui_ImplSDLRenderer2_Init(m_Renderer);
 
 	return success;
 }
 
 void Mission::updateSpaceship(double dt)
 {
+    ImGui_ImplSDL2_NewFrame();
+	ImGui_ImplSDLRenderer2_NewFrame();
+    ImGui::NewFrame();
+
 	SDL_SetRenderDrawColor(m_Renderer, 0, 0, 0, 255);
 	SDL_RenderClear(m_Renderer);
 	SDL_SetRenderDrawColor(m_Renderer, 255, 255, 255, 255);
@@ -141,13 +156,16 @@ void Mission::updateSpaceship(double dt)
 
 	if (m_Spaceship.getState() == State::LANDED)
 	{
-		printf("\n\nSpaceship landed succesfully. Press ESC to exit. \n");
+		printf("\n\nSpaceship landed succesfully. Press ESC to exit. \n\n");
 	}
 	else 
 	{ 
 		m_Spaceship.move(pid_out, dh);  
 		printf("Error: %f \ndx: %f \n", error, pid_out); 
 	}
+
+	ImGui::Render();
+	ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
 }
 
 void Mission::runMission()

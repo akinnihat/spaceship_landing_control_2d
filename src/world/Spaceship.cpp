@@ -7,7 +7,7 @@ void Spaceship::spawnSpaceship(int x, int y, SDL_Texture* texture)
 	m_State = State::FREEFALL;
 	m_Texture = texture;
 
-	printf("Spaceship has been spawned at (%f, %f) \n", m_X, m_Y);
+	printf("Spaceship has been spawned at (%d, %d) \n", m_X, m_Y);
 }
 
 void Spaceship::move(int dx, int dy)
